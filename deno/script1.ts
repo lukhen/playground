@@ -3,21 +3,28 @@ import * as TE from "https://deno.land/x/fp_ts@v2.11.4/TaskEither.ts"
 
 import { assertEquals, assert } from "https://deno.land/std@0.141.0/testing/asserts.ts"
 
-const x: E.Either<number, string> = E.right("qw")
-
 interface User {
     name: string
 }
 
-const f:
-    (n: number) => TE.TaskEither<string, User> =
-    n => TE.right({ name: "lukhen" })
+const f_success:
+    (n: number) => TE.TaskEither<Error, User> =
+    n => TE.tryCatch(
+        () => new Promise((resolve, reject) => {
+            setTimeout(() => { resolve({ name: "lukhen" }) }),
+                2000
+        }),
+        E.toError
+    )
 
 
 Deno.test("Some test", async () => {
-    const x = await f(2)()
+    const x = await f_success(2)()
     assert(E.isRight(x), "fetch failed")
 })
+
+
+const x: E.Either<number, string> = E.right("qw")
 
 Deno.test("First deno test", () => {
     assertEquals(x, E.right("qw"), "failed because of some reason")
