@@ -18,11 +18,26 @@ const f_success:
     )
 
 
+const f_failure:
+    (n: number) => TE.TaskEither<Error, User> =
+    n => TE.tryCatch(
+        () => new Promise((resolve, reject) => {
+            setTimeout(() => { reject("some error") }),
+                2000
+        }),
+        E.toError
+    )
+
+
 Deno.test("Some test", async () => {
     const x = await f_success(2)()
     assert(E.isRight(x), "fetch failed")
 })
 
+Deno.test("Another test", async () => {
+    const x = await f_failure(2)()
+    assert(E.isLeft(x), "fetch succeded")
+})
 
 const x: E.Either<number, string> = E.right("qw")
 
